@@ -22,8 +22,6 @@ function lineResolver (line) {
   const [cardInfo, numbers] = line.split(': ')
   const [winningNumbersString, selectedNumbersString] = numbers.split('|')
 
-  const cardNumber = parseInt(cardInfo.split(' ')[1])
-
   // TODO: optimize by sorting both arrays
   const winningNumbers = parseStringToIntegers(winningNumbersString)
   const selectedNumbers = parseStringToIntegers(selectedNumbersString)
@@ -34,7 +32,8 @@ function lineResolver (line) {
     }
   }
 
-  console.log(`Card: ${cardNumber} MatchedWinnings: ${points}`);
+  // const cardNumber = parseInt(cardInfo.split(' ')[1])
+  // console.log(`Card: ${cardNumber} MatchedWinnings: ${points}`);
   return points
 }
 
@@ -53,4 +52,32 @@ async function resolverPart1(fileName) {
   console.log(`For file name ${fileName} => total points: ${totalIncreased}`);
 }
 
-resolver('input_1');
+async function resolverPart2(fileName) {
+  const linesArray = readFileByLines(fileName)
+  const cardResults = { }
+
+  for (let lineIndex = 0; lineIndex < linesArray.length; lineIndex++) {
+    const line = linesArray[lineIndex]
+    const linePoints = lineResolver(line)
+
+    // Insert default card you have
+    if (cardResults[lineIndex] === undefined) cardResults[lineIndex] = 1
+
+    // Get how much copies of card you have
+    const cardMultiplier = cardResults[lineIndex]
+
+    // Mark new copies for next cards
+    for (let cardCopy = 1; cardCopy <= linePoints; cardCopy++) {
+      const cardIndexToAdjust = cardCopy + lineIndex
+      const cardIndexValue = cardResults[cardIndexToAdjust] === undefined ? 1 : cardResults[cardIndexToAdjust]
+      const newCardIndexValue = cardIndexValue + cardMultiplier
+
+      cardResults[cardIndexToAdjust] = newCardIndexValue
+    }
+  }
+
+  console.log(`For file name ${fileName} => total points: ${Object.values(cardResults).reduce((a, b) => a + b, 0)}`);
+}
+
+resolverPart1('input_1');
+resolverPart2('input_2');
