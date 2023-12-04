@@ -16,12 +16,6 @@ function parseStringToIntegers (numbersString) {
   return numberArray
 }
 
-function adjustPoints (points) {
-  if(points === 0) return 1
-
-  return points * 2
-}
-
 function lineResolver (line) {
   let points = 0
   
@@ -36,20 +30,24 @@ function lineResolver (line) {
 
   for (const winningNumber of winningNumbers) {
     for (const selectedNumber of selectedNumbers) {
-      if(winningNumber === selectedNumber) points = adjustPoints(points)
+      if(winningNumber === selectedNumber) points = points + 1
     }
   }
 
-  // console.log(`Card: ${cardNumber} Points: ${points}`);
+  console.log(`Card: ${cardNumber} MatchedWinnings: ${points}`);
   return points
 }
 
-async function resolver(fileName) {
+async function resolverPart1(fileName) {
   const linesArray = readFileByLines(fileName)
   let totalIncreased = 0
 
   for (const line of linesArray) {
-    totalIncreased = totalIncreased + lineResolver(line)
+    const linePoints = lineResolver(line)
+    if (linePoints !== 0) {
+      const linePointsSquared = Math.pow(2, linePoints - 1)
+      totalIncreased = totalIncreased + linePointsSquared
+    }
   }
 
   console.log(`For file name ${fileName} => total points: ${totalIncreased}`);
